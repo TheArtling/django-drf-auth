@@ -45,6 +45,7 @@ def read(fname):
     except IOError:
         return ''
 
+
 setup(
     name="django-drf-auth",
     version=app.__version__,
@@ -52,7 +53,10 @@ setup(
     long_description=read('README.rst'),
     license='The MIT License',
     platforms=['OS Independent'],
-    keywords='django, app, reusable, authentication, drf, rest, facebook, login, api',
+    keywords=(
+        'django, app, reusable, authentication, drf, rest, facebook, login'
+        ' api'
+    ),
     author='Martin Brochhaus',
     author_email='mbrochh@gmail.com',
     url="https://github.com/TheArtling/django-drf-auth",

@@ -1,5 +1,5 @@
 """URLs for the drf_auth app."""
-# from compat import url
+# from django.conf.urls import url
 
 # from . import views
 
