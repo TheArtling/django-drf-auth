@@ -46,13 +46,22 @@ To get the latest commit from GitHub
 pip install -e git+git://github.com/TheArtling/django-drf-auth.git#egg=drf_auth
 ```
 
-Add `drf_auth` to your `INSTALLED_APPS`
+Add `drf_auth` to your `INSTALLED_APPS` setting:
 
 ```python
 INSTALLED_APPS = (
     ...,
     'drf_auth',
 )
+```
+
+Add `FinishSignupMiddleware` to your `MIDDLEWARE_CLASSES` setting:
+
+```python
+MIDDLEWARE = [
+  ...
+  'drf_auth.middleware.drf_auth_middleware.FinishSignupMiddleware',
+]
 ```
 
 Add the `drf_auth` URLs to your `urls.py`
@@ -63,8 +72,7 @@ urlpatterns = [
 ]
 ```
 
-
-Don't forget to migrate your database
+Don't forget to migrate your database:
 
 ```bash
 ./manage.py migrate drf_auth

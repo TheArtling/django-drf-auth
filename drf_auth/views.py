@@ -1,8 +1,6 @@
 """Views for the drf_auth app."""
-# from django.views.generic import TemplateView
-
-# from . import models
+from django.views.generic import TemplateView
 
 
-# class YourView(TemplateView):
-#    template_name = 'drf_auth/default.html'
+class FinishSignupView(TemplateView):
+    template_name = 'drf_auth/finish_signup.html'

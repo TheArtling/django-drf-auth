@@ -59,6 +59,10 @@ INSTALLED_APPS = EXTERNAL_APPS + INTERNAL_APPS
 MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'drf_auth.middleware.FinishSignupMiddleware',
 ]
 
 SECRET_KEY = 'foobar'
