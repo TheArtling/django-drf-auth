@@ -12,6 +12,8 @@ class FinishSignupMiddleware(object):
 
     """
     def process_request(self, request):
+        if not hasattr(request, 'user'):
+            return None
         if request.user.is_authenticated():
             if not request.user.email:
                 finish_signup_url = reverse('drf_auth_finish_signup')
