@@ -16,6 +16,7 @@ class FacebookLoginAPIView(views.APIView):
     permission_classes = [permissions.AllowAny, ]
 
     def post(self, request, *args, **kwargs):
+        # First, we need to get a token so that we can make more API requests
         resp = requests.get(
             '{}/oauth/access_token?client_id={}&client_secret={}'
             '&grant_type=client_credentials'.format(
@@ -23,6 +24,8 @@ class FacebookLoginAPIView(views.APIView):
                 settings.FACEBOOK_APP_ID,
                 settings.FACEBOOK_APP_SECRET))
         # TODO: Handle cases where the response is not OK
+
+        # Next, we check if the given token is valid
         app_access_token = resp.content
         user_access_token = request.data['authResponse']['accessToken']
         resp = requests.get(
@@ -31,12 +34,15 @@ class FacebookLoginAPIView(views.APIView):
                 user_access_token,
                 app_access_token))
         # TODO: Handle cases where the response is not OK
+
+        # Finally, we request the user-data for that valid token's user-id.
         facebook_user_id = json.loads(resp.content)['data']['user_id']
         resp = requests.get(
             '{}/{}?{}&fields=email,first_name,last_name'.format(
                 FACEBOOK_API_BASE_URL,
                 facebook_user_id,
                 app_access_token))
+
         # TODO: Create user, if doesn't exist and sign them in, handle special
         # error cases for users that are already connected to FB etc
         return response.Response('OK')
