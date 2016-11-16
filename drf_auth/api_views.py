@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 import requests
 from rest_framework import permissions, views, response, status
 
+from . import models
 from . import serializers
 
 
@@ -45,6 +46,24 @@ class FacebookLoginAPIView(views.APIView):
 
         # TODO: Create user, if doesn't exist and sign them in, handle special
         # error cases for users that are already connected to FB etc
+        try:
+            facebook_user = models.Facebook.objects.get(
+                facebook_user_id=facebook_user_id)
+        except models.Facebook.DoesNotExist:
+            facebook_user = None
+
+        user = authenticate(facebook_user=facebook_user)
+
+        if user:
+            if user.is_active:
+                login(request, user)
+                return response.Response('OK')
+
+            return response.Response(
+                {'non_field_errors': ['Account is disabled'], },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         return response.Response('OK')
 
 

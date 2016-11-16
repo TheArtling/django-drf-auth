@@ -16,6 +16,9 @@ class FinishSignupMiddleware(object):
             return None
         if request.user.is_authenticated():
             if not request.user.email:
+                admin_url = reverse('admin:index')
+                if request.path.startswith(admin_url):
+                    return None
                 finish_signup_url = reverse('drf_auth_finish_signup')
                 if not request.path == finish_signup_url:
                     return redirect(finish_signup_url)

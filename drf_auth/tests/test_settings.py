@@ -68,7 +68,8 @@ MIDDLEWARE_CLASSES = [
 
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
-    "drf_auth.auth_backends.DRFAuthAuthenticationBackend",
+    "drf_auth.auth_backends.EmailAuthenticationBackend",
+    "drf_auth.auth_backends.FacebookAuthenticationBackend",
 )
 
 REST_FRAMEWORK = {

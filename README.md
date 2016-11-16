@@ -73,6 +73,17 @@ MIDDLEWARE = [
 ]
 ```
 
+Add `EmailAuthenticationBackend` and `FacebookAuthenticationBackend` to your
+`AUTHENTICATION_BACKENDS` setting:
+
+```python
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "drf_auth.auth_backends.EmailAuthenticationBackend",
+    "drf_auth.auth_backends.FacebookAuthenticationBackend",
+)
+```
+
 Add the `drf_auth` URLs to your `urls.py`
 
 ```python

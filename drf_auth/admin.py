@@ -1,11 +1,16 @@
 """Admin classes for the drf_auth app."""
-# from django.contrib import admin
+from django.contrib import admin
 
-# from . import models
+from . import models
 
 
-# class YourModelAdmin(admin.ModelAdmin):
-#    list_display = ['some', 'fields', ]
-#    search_fields = ['some', 'fieds', ]
+class FacebookAdmin(admin.ModelAdmin):
+    list_display = ['email', 'facebook_user_id', ]
+    search_fields = ['user__email', 'facebook_user_id', ]
+    raw_id_fields = ['user', ]
 
-# admin.site.register(models.YourModel, YourModelAdmin)
+    def email(self, obj):
+        return obj.user.email
+
+
+admin.site.register(models.Facebook, FacebookAdmin)

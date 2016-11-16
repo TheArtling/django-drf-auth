@@ -6,14 +6,14 @@ from mixer.backend.django import mixer
 from .. import auth_backends
 
 
-class DRFAuthAuthenticationBackendTestCase(TestCase):
+class EmailAuthenticationBackendTestCase(TestCase):
     longMessage = True
 
     def test_backend(self):
         user = mixer.blend('auth.User')
         user.set_password('test')
         user.save()
-        b = auth_backends.DRFAuthAuthenticationBackend()
+        b = auth_backends.EmailAuthenticationBackend()
         result = b.authenticate(email=user.email, password='test')
         self.assertEqual(result, user, msg=(
             'Should return the user if credentials match an existing user'))

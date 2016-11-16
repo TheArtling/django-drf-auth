@@ -15,7 +15,14 @@ class FinishSignupMiddlewareTestCase(TestCase):
         req = RequestFactory().get('/')
         result = m.process_request(req)
         self.assertEqual(result, None, msg=(
-            'Should do nothing if the user is not authenticated.'))
+            'Should do nothing if the user is not authenticated'))
+
+        admin_req = RequestFactory().get('/admin/')
+        admin_req.user = user
+        result = m.process_request(admin_req)
+        self.assertEqual(result, None, msg=(
+            'Should do nothing if user tries to access the Django admin,'
+            ' even if the user does not have an email'))
 
         req.user = user
         result = m.process_request(req)

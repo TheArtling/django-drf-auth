@@ -27,5 +27,5 @@ class LoginSerializerTestCase(TestCase):
         s = serializers.LoginSerializer(data=data)
         self.assertTrue(s.is_valid(), msg=(
             'Should be valid if all data is given and email does exist.'
-            ' Note: Serializer does not check if password is correct. It merely'
-            ' checks if the given data makes sense.'))
+            ' Note: Serializer does not check if password is correct. It'
+            ' merely checks if the given data makes sense.'))
