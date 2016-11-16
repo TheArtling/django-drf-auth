@@ -7,8 +7,8 @@ from . import api_views
 urlpatterns = [
     url(r'^login/$',
         api_views.LoginAPIView.as_view(),
-        name='drf_auth_api_login'),
+        name='drf_auth_api_session_login'),
     url(r'^logout/$',
         api_views.LogoutAPIView.as_view(),
-        name='drf_auth_api_logout'),
+        name='drf_auth_api_session_logout'),
 ]

@@ -13,10 +13,18 @@ However, we have found that we always need a few things on top of allauth and
 we always end up hooking up so many third party apps and overriding various
 settings/forms/classes, that "hooking up allauth" isn't really all that simple.
 
+Unfortunately, our web apps are currently hybrid apps where some parts are
+"old schoold" Django views that rely on session based authentication. Therefore
+we simply send our AJAX requests from our ReactJS apps with
+`withCredentials: true` and we re-use the session based authentication that was
+already set by Django. Our mobile apps, on the other hand, don't rely on
+session based authentication and should use JSON Web Tokens.
+
 We usually need:
 
 1. Authentication for normal web-forms.
-1. Autentication against API endpoints for ReactJS components / mobile apps.
+1. Authentication against API endpoints for session based auth for ReactJS
+   components / mobile apps.
 1. Facebook login.
 1. Authentication via email, not username. Assumption: User.email is unique.
 1. Making sure that we collect name & email if users blocked those access
