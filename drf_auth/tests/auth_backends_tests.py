@@ -25,3 +25,18 @@ class EmailAuthenticationBackendTestCase(TestCase):
         result = b.authenticate(email=user.email, password='wrong')
         self.assertEqual(result, None, msg=(
             'Should return `None` if password is wrong'))
+
+
+class FacebookAuthenticationBackendTestCase(TestCase):
+    longMessage = True
+
+    def test_backend(self):
+        facebook_user = mixer.blend('drf_auth.Facebook')
+        b = auth_backends.FacebookAuthenticationBackend()
+        result = b.authenticate()
+        self.assertEqual(result, None, msg=(
+            'Should return `None` if no `Facebook` instance is given'))
+        result = b.authenticate(facebook_user=facebook_user)
+        self.assertEqual(result, facebook_user.user, msg=(
+            'Should return the user that is tied to the given `Facebook`'
+            ' instance.'))
