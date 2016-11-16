@@ -107,3 +107,6 @@ git push -u origin feature_branch
 ```
 
 In order to run the tests, simply execute `./runtests.py`.
+
+In order to run the webpack-dev-server, run `npm install` and then
+`node server.js`.
