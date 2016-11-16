@@ -77,3 +77,5 @@ REST_FRAMEWORK = {
 }
 
 SECRET_KEY = 'foobar'
+
+from .local_settings import *  # NOQA

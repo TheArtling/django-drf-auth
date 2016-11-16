@@ -18,7 +18,7 @@ export function ajaxEpicFactory(TYPE, urlFunc, method) {
         let url = urlFunc(action)
         let headers = {
           "X-CSRFToken": cookie.load("csrftoken"),
-          //"Content-Type": "application/json",
+          "Content-Type": "application/json",
           "Accept": "application/json",
         }
         let options = {

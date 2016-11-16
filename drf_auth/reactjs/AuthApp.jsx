@@ -23,8 +23,17 @@ export default function configureStore() {
   );
   return store;
 }
-
 let store = configureStore()
+
+
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : process.env.FACEBOOK_APP_ID,
+    cookie     : true,
+    xfbml      : true,
+    version    : 'v2.8'
+  });
+}
 
 
 class AuthApp extends React.Component {

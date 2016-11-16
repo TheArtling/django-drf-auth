@@ -5,6 +5,9 @@ from . import api_views
 
 
 urlpatterns = [
+    url(r'^fb-login/$',
+        api_views.FacebookLoginAPIView.as_view(),
+        name='drf_auth_api_facebook_login'),
     url(r'^login/$',
         api_views.LoginAPIView.as_view(),
         name='drf_auth_api_session_login'),

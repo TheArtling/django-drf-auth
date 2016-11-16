@@ -11,3 +11,11 @@ export const postLogin = (formValues, successCallback) => ({
 export const postLoginEpic = ajaxEpicFactory(
   POST_LOGIN, (action) => "/api/v1/login/", "POST",
 )
+
+
+export const POST_FB_LOGIN = "POST_FB_LOGIN"
+export const postFacebookLogin = (formValues, successCallback) => ({
+  type: POST_FB_LOGIN, formValues: formValues, successCallback: successCallback })
+export const postFacebookLoginEpic = ajaxEpicFactory(
+  POST_FB_LOGIN, (action) => "/api/v1/fb-login/", "POST",
+)

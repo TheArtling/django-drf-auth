@@ -1,8 +1,45 @@
+import json
+
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 
+import requests
 from rest_framework import permissions, views, response, status
 
 from . import serializers
+
+
+FACEBOOK_API_BASE_URL = 'https://graph.facebook.com'
+
+
+class FacebookLoginAPIView(views.APIView):
+    permission_classes = [permissions.AllowAny, ]
+
+    def post(self, request, *args, **kwargs):
+        resp = requests.get(
+            '{}/oauth/access_token?client_id={}&client_secret={}'
+            '&grant_type=client_credentials'.format(
+                FACEBOOK_API_BASE_URL,
+                settings.FACEBOOK_APP_ID,
+                settings.FACEBOOK_APP_SECRET))
+        # TODO: Handle cases where the response is not OK
+        app_access_token = resp.content
+        user_access_token = request.data['authResponse']['accessToken']
+        resp = requests.get(
+            '{}/debug_token?input_token={}&{}'.format(
+                FACEBOOK_API_BASE_URL,
+                user_access_token,
+                app_access_token))
+        # TODO: Handle cases where the response is not OK
+        facebook_user_id = json.loads(resp.content)['data']['user_id']
+        resp = requests.get(
+            '{}/{}?{}&fields=email,first_name,last_name'.format(
+                FACEBOOK_API_BASE_URL,
+                facebook_user_id,
+                app_access_token))
+        # TODO: Create user, if doesn't exist and sign them in, handle special
+        # error cases for users that are already connected to FB etc
+        return response.Response('OK')
 
 
 class LoginAPIView(views.APIView):

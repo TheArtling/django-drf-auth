@@ -10,3 +10,4 @@ dist/
 docs/_build/
 local_settings.py
 node_modules/
+webpack.local_settings.js

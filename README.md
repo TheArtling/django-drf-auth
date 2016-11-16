@@ -108,5 +108,12 @@ git push -u origin feature_branch
 
 In order to run the tests, simply execute `./runtests.py`.
 
-In order to run the webpack-dev-server, run `npm install` and then
+In order to run the test project, make sure to create copies of
+`local_settings.py.sample` and `webpack.local_settings.js` and change the
+relevant values in those files.
+
+In order to run the webpack-dev-server, run `npm install` and run
 `node server.js`.
+
+In order to run the local development server, run
+`./manage.py runserver IP:8000`

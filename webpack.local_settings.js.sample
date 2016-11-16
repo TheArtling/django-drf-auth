@@ -1,0 +1,4 @@
+module.exports = {
+  IP: '192.168.X.X',
+  FACEBOOK_APP_ID: 'XXX',
+}

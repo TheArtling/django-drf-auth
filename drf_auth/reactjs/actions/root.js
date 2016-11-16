@@ -4,4 +4,5 @@ import * as auth from "./auth"
 
 export const rootEpic = combineEpics(
   auth.postLoginEpic,
+  auth.postFacebookLoginEpic,
 )
