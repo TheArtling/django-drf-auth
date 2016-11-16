@@ -18,6 +18,7 @@ We usually need:
 1. Authentication for normal web-forms.
 1. Autentication against API endpoints for ReactJS components / mobile apps.
 1. Facebook login.
+1. Authentication via email, not username. Assumption: User.email is unique.
 1. Making sure that we collect name & email if users blocked those access
    rights on Facebook.
 1. Redirect to different pages after login depending on the user's status.
