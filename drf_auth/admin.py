@@ -5,7 +5,7 @@ from . import models
 
 
 class FacebookAdmin(admin.ModelAdmin):
-    list_display = ['email', 'facebook_user_id', ]
+    list_display = ['user', 'email', 'facebook_user_id', ]
     search_fields = ['user__email', 'facebook_user_id', ]
     raw_id_fields = ['user', ]
 

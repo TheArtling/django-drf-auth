@@ -10,6 +10,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 from .. import api_views
 from .. import exceptions
+from .. import models
 
 
 class FacebookLoginAPIViewTestCase(TestCase):
@@ -156,6 +157,8 @@ class FacebookLoginAPIViewTestCase(TestCase):
             ' they are already connected, then we delete the Facebook'
             ' connection'))
         self.assertEqual(resp.data, 'Facebook connection deleted')
+        fb_user = models.Facebook.objects.all()
+        self.assertEqual(fb_user.count(), 0)
 
     @patch('drf_auth.api_views.get_user_data')
     @patch('drf_auth.api_views.get_debug_token')
@@ -196,7 +199,9 @@ class FacebookLoginAPIViewTestCase(TestCase):
         req.user = AnonymousUser()
         req.session = self.client.session
         resp = api_views.FacebookLoginAPIView().as_view()(req, version='v1')
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200, msg=(
+            'If the user logs in with Facebook and has done it before, they'
+            ' should be logged in'))
 
     @patch('drf_auth.api_views.get_user_data')
     @patch('drf_auth.api_views.get_debug_token')
@@ -236,6 +241,8 @@ class FacebookLoginAPIViewTestCase(TestCase):
         resp = api_views.FacebookLoginAPIView().as_view()(req, version='v1')
         self.assertEqual(resp.status_code, 200, msg=(
             'Should create new Django & Facebook instance.'))
+        fb_user = models.Facebook.objects.all()
+        self.assertEqual(fb_user.count(), 1)
 
     @patch('drf_auth.api_views.get_user_data')
     @patch('drf_auth.api_views.get_debug_token')
@@ -253,6 +260,29 @@ class FacebookLoginAPIViewTestCase(TestCase):
         resp = api_views.FacebookLoginAPIView().as_view()(req, version='v1')
         self.assertEqual(resp.status_code, 200, msg=(
             'Should create new Django & Facebook instance.'))
+        fb_user = models.Facebook.objects.all()
+        self.assertEqual(fb_user.count(), 1)
+
+    @patch('drf_auth.api_views.get_user_data')
+    @patch('drf_auth.api_views.get_debug_token')
+    @patch('drf_auth.api_views.get_app_access_token')
+    def test_case7_authed_user_connects_to_facebook(
+            self, get_app_access_token_mock, get_debug_token_mock,
+            get_user_data_mock):
+        user = mixer.blend('auth.User')
+        self._create_mocks(
+            get_app_access_token_mock, get_debug_token_mock,
+            get_user_data_mock, 'fb@example.com')
+        data = {'authResponse': {'accessToken': '123'}}
+        req = APIRequestFactory().post('/', data=data, format='json')
+        force_authenticate(req, user)
+        req.session = self.client.session
+        resp = api_views.FacebookLoginAPIView().as_view()(req, version='v1')
+        self.assertEqual(resp.status_code, 200, msg=(
+            'Should create new Facebook instance connected to this user.'))
+        fb_user = models.Facebook.objects.all()
+        self.assertEqual(fb_user.count(), 1)
+        self.assertEqual(fb_user[0].user, user)
 
     @patch('drf_auth.api_views.get_user_data')
     @patch('drf_auth.api_views.get_debug_token')
@@ -260,7 +290,8 @@ class FacebookLoginAPIViewTestCase(TestCase):
     def test_account_disabled(
             self, get_app_access_token_mock, get_debug_token_mock,
             get_user_data_mock):
-        user = mixer.blend('auth.User', email='fb@example.com', is_active=False)
+        user = mixer.blend(
+            'auth.User', email='fb@example.com', is_active=False)
         mixer.blend('drf_auth.Facebook', user=user, facebook_user_id='123')
         self._create_mocks(
             get_app_access_token_mock, get_debug_token_mock,

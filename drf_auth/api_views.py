@@ -144,89 +144,125 @@ class FacebookLoginAPIView(views.APIView):
           or an error response that should be returned and `success` is a
           boolean. If `success` is `False`, you should return the `response`.
           If `success` is `True`, you can proceed to login the returned
-          `facebook_user`.
+          `facebook_user`. That means: If `success` is `True`, there is always
+          something in `facebook_user`. If `success` is `False`, there is
+          always something in `response`.
 
-        In pseudocode, this function looks like this:
+        Note: This view can be used to login/signup an AnonymousUser, but it
+        can also be used to connect an authenticated user to Facebook or
+        disconnect an authenticated and connected user from Facebook.
 
-        # If we have a Facebook instance for that facebook_user_id
-            # If current user is authenticated
-                # If current user == facebook.user
+        In pseudocode, this function would look like below. You can
+        see that each if-else branch results in an action (a `case`) at the
+        "leafes" of the nested if-else-hierarchy. In order to avoid such a
+        deeply nested code structure, the actual function is not implemented
+        in this way, but you will find one test-case for each case.
+
+        NOTE: You will find the case names in the code as comments and also
+        in the names of the test-functions. Make sure you keep them all in sync
+        when you change this code.
+
+        If we have a Facebook instance for that facebook_user_id:
+            If current user is authenticated:
+                If current user == facebook.user:
                     # Case1: Delete instance, user wants to disconnect
-                # Case2: Else: ask to disconnect from other account first
-            # Else: Case3: proceed to login
-        # Else:
-            # If is facebook_email given?
-                # If django user with that email exists
-                    # Case4: Ask to login and connect
-                # Else: Case5: Create Facebook & Django instance and proceed to
-                        login
-            # Else: Case6: Create Facebook & Django instance
+                Else:
+                    # Case2: Ask to disconnect from other account first
+            Else:
+                # Case3: proceed to login
+        Else:
+            If current user is authenticated:
+                # Case7: Create instance, user wants to connect
+            Else:
+                If is facebook_email given:
+                    If django user with that email exists
+                        # Case4: Ask to login and connect
+                    Else:
+                        # Case5: Create Facebook & Django instance and proceed
+                                 to login
+                Else:
+                    # Case6: Create Facebook & Django instance
 
         """
-
+        User = get_user_model()
         try:
             facebook_user = models.Facebook.objects.get(
                 facebook_user_id=facebook_user_id)
         except models.Facebook.DoesNotExist:
             facebook_user = None
+        user_with_facebook_email = None
+        if facebook_email:
+            try:
+                user_with_facebook_email = User.objects.get(
+                    email=facebook_email)
+            except User.DoesNotExist:
+                user_with_facebook_email = None
 
-        if facebook_user:
-            if request_user.is_authenticated():
-                if request_user == facebook_user.user:
-                    facebook_user.delete()
-                    return (
-                        facebook_user,
-                        response.Response('Facebook connection deleted'),
-                        False,
-                    )
-                else:
-                    return (
-                        facebook_user,
-                        response.Response(
-                            {'non_field_errors': [
-                                'You have already connected your Facebook'
-                                ' profile to another account. Please login to'
-                                ' that account and disconnect your Facebook'
-                                ' profile there, first.'], },
-                            status=status.HTTP_400_BAD_REQUEST,
-                        ),
-                        False,
-                    )
-            else:
-                return (facebook_user, None, True)
-        else:
-            User = get_user_model()
+        # Case 2: Ask to disconnect from other account first
+        if (facebook_user and
+                request_user.is_authenticated() and
+                request_user != facebook_user.user):
+            error = (
+                'You have already connected your Facebook profile to another'
+                ' account. Please login to that account and disconnect your'
+                ' Facebook profile there, first.')
+            return (
+                facebook_user,
+                response.Response(
+                    {'non_field_errors': [error], },
+                    status=status.HTTP_400_BAD_REQUEST,
+                ),
+                False,
+            )
+
+        # Case4: Ask to login and connect
+        if (not facebook_user and
+                not request_user.is_authenticated() and
+                facebook_email and
+                user_with_facebook_email):
+            error = (
+                'You have already created an account via email. Please login'
+                ' to your account and connect to Facebook after you have'
+                ' logged in.')
+            return (
+                facebook_user,
+                response.Response(
+                    {'non_field_errors': [error], },
+                    status=status.HTTP_400_BAD_REQUEST,
+                ),
+                False,
+            )
+
+        # Case 3: Proceed to login
+        if facebook_user and not request_user.is_authenticated():
+            return (facebook_user, None, True)
+
+        # Case 1: Delete instance, user wants to disconnect
+        if (facebook_user and
+                request_user.is_authenticated() and
+                request_user == facebook_user.user):
+            facebook_user.delete()
+            return (
+                facebook_user,
+                response.Response('Facebook connection deleted'),
+                False,
+            )
+
+        # Case7: Create instance, user wants to connect
+        if not facebook_user and request_user.is_authenticated():
+            facebook_user = models.Facebook.objects.create(
+                user=request_user, facebook_user_id=facebook_user_id)
+            return (facebook_user, None, True)
+
+        # Case5 & 6: Create Facebook & Django instance and proceed to login
+        if not facebook_user and not request_user.is_authenticated():
+            create_kwargs = {'username': uuid.uuid4()}
             if facebook_email:
-                try:
-                    user = User.objects.get(email=facebook_email)
-                except User.DoesNotExist:
-                    user = None
-                if user:
-                    return (
-                        facebook_user,
-                        response.Response(
-                            {'non_field_errors': [
-                                'You have already created an account via'
-                                ' email. Please login to your account and'
-                                ' connect to Facebook after you have logged'
-                                ' in.'], },
-                            status=status.HTTP_400_BAD_REQUEST,
-                        ),
-                        False,
-                    )
-                else:
-                    user = User.objects.create(
-                        username=uuid.uuid4(),
-                        email=facebook_email
-                    )
-                    facebook_user = models.Facebook.objects.create(
-                        user=user, facebook_user_id=facebook_user_id)
-                    return (facebook_user, None, True)
-            else:
-                user = User.objects.create(username=uuid.uuid4())
-                facebook_user = models.Facebook.objects.create(
-                    user=user, facebook_user_id=facebook_user_id)
-                return (facebook_user, None, True)
+                create_kwargs.update({'email': facebook_email})
+            user = User.objects.create(**create_kwargs)
+            facebook_user = models.Facebook.objects.create(
+                user=user, facebook_user_id=facebook_user_id)
+            return (facebook_user, None, True)
 
     def post(self, request, *args, **kwargs):
         if not request.data:
