@@ -16,6 +16,12 @@ FACEBOOK_API_BASE_URL = 'https://graph.facebook.com'
 
 
 def get_app_access_token():  # pragma: nocover
+    """
+    Get's an access token from Facebook.
+
+    Helper function that can be mocked in tests.
+
+    """
     resp = requests.get(
         '{}/oauth/access_token?client_id={}&client_secret={}'
         '&grant_type=client_credentials'.format(
@@ -26,6 +32,12 @@ def get_app_access_token():  # pragma: nocover
 
 
 def get_debug_token(app_access_token, user_access_token):  # pragma: nocover
+    """
+    Validates an user access token from Facebook.
+
+    Helper function that can be mocked in tests.
+
+    """
     resp = requests.get(
         '{}/debug_token?input_token={}&{}'.format(
             FACEBOOK_API_BASE_URL,
@@ -35,6 +47,12 @@ def get_debug_token(app_access_token, user_access_token):  # pragma: nocover
 
 
 def get_user_data(app_access_token, facebook_user_id):  # pragma: nocover
+    """
+    Retrieves user profile data from Facebook.
+
+    Helper function that can be mocked in tests.
+
+    """
     resp = requests.get(
         '{}/{}?{}&fields=email,first_name,last_name'.format(
             FACEBOOK_API_BASE_URL,
@@ -44,6 +62,12 @@ def get_user_data(app_access_token, facebook_user_id):  # pragma: nocover
 
 
 class FacebookLoginAPIView(views.APIView):
+    """
+    Performs a login or signup via Facebook.
+
+
+
+    """
     permission_classes = [permissions.AllowAny, ]
 
     def get_app_access_token(self):
@@ -86,6 +110,12 @@ class FacebookLoginAPIView(views.APIView):
         return (resp, True)
 
     def get_user_data(self, app_access_token, facebook_user_id):
+        """
+        Fetches user profile data for the given facebook_user_id.
+
+        This is needed so that we can get the user's email address.
+
+        """
         resp = get_user_data(app_access_token, facebook_user_id)
         if resp.status_code != 200:
             resp = response.Response(
@@ -101,7 +131,7 @@ class FacebookLoginAPIView(views.APIView):
     def get_facebook_user(self, request_user, facebook_user_id,
                           facebook_email):
         """
-        Performs security checks before we can login the user.
+        Performs security checks before we proceed to login the user.
 
         :param request_user: The current user. Can be AnonymousUser.
         :param facebook_user_id: The Facebook user-id that we got from the
@@ -109,12 +139,12 @@ class FacebookLoginAPIView(views.APIView):
         :param facebook_email: The email that we have requested from the
           Facebook API.
 
-        Returns a 3-Tuple with `(facebook_user, response, success)` where
-        `facebook_user` is a `Facebook` instance, `response` is either `None`
-        or an error response that should be returned and `success` is a
-        boolean. If `success` is `False`, you should return the `response`.
-        If `success` is `True`, you can proceed to login the returned
-        `facebook_user`.
+        :returns: A 3-Tuple with `(facebook_user, response, success)` where
+          `facebook_user` is a `Facebook` instance, `response` is either `None`
+          or an error response that should be returned and `success` is a
+          boolean. If `success` is `False`, you should return the `response`.
+          If `success` is `True`, you can proceed to login the returned
+          `facebook_user`.
 
         In pseudocode, this function looks like this:
 
@@ -245,6 +275,7 @@ class FacebookLoginAPIView(views.APIView):
 
 
 class LoginAPIView(views.APIView):
+    """Performs a login for the user with the given credentials."""
     serializer_class = serializers.LoginSerializer
     permission_classes = [permissions.AllowAny, ]
 
@@ -273,6 +304,7 @@ class LoginAPIView(views.APIView):
 
 
 class LogoutAPIView(views.APIView):
+    """Performs a logout for the current user."""
     def post(self, request, *args, **kwargs):
         logout(request._request)
         return response.Response('OK')
