@@ -42,6 +42,7 @@ class AuthApp extends React.Component {
       <Provider store={store}>
         <Router history={browserHistory}>
           <Route path="/" component={AuthContainer} />
+          <Route path="/auth/finish-signup/" component={AuthContainer} />
         </Router>
       </Provider>
     )

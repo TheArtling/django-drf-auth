@@ -14,4 +14,7 @@ urlpatterns = [
     url(r'^logout/$',
         api_views.LogoutAPIView.as_view(),
         name='drf_auth_api_session_logout'),
+    url(r'^finish-signup/$',
+        api_views.FinishSignupAPIView.as_view(),
+        name='drf_auth_api_finish_signup'),
 ]

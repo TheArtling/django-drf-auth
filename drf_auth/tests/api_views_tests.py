@@ -353,3 +353,25 @@ class LogoutAPIViewTestCase(TestCase):
         resp = api_views.LogoutAPIView().as_view()(req, version='v1')
         self.assertEqual(resp.status_code, 200, msg=(
             'Should be callable by anyone'))
+
+
+class FinishSignupAPIViewTestCase(TestCase):
+    longMessage = True
+
+    def test_view(self):
+        user = mixer.blend('auth.User', email='')
+        data = {}
+        req = APIRequestFactory().post('/', data=data)
+        force_authenticate(req, user)
+        resp = api_views.FinishSignupAPIView().as_view()(req, version='v1')
+        self.assertEqual(resp.status_code, 400, msg=(
+            'Should return 400 if no data is given'))
+
+        data = {'email': 'test@example.com'}
+        req = APIRequestFactory().post('/', data=data)
+        force_authenticate(req, user)
+        resp = api_views.FinishSignupAPIView().as_view()(req, version='v1')
+        self.assertEqual(resp.status_code, 200, msg=(
+            'Should return 200 if new email could be saved'))
+        user.refresh_from_db()
+        self.assertEqual(user.email, 'test@example.com')

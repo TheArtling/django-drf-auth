@@ -344,3 +344,18 @@ class LogoutAPIView(views.APIView):
     def post(self, request, *args, **kwargs):
         logout(request._request)
         return response.Response('OK')
+
+
+class FinishSignupAPIView(views.APIView):
+    """Collects email address of the user."""
+    serializer_class = serializers.FinishSignupSerializer
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid():
+            return response.Response(
+                serializer.errors, status.HTTP_400_BAD_REQUEST)
+        request.user.email = serializer.data['email']
+        request.user.save()
+        return response.Response('OK')

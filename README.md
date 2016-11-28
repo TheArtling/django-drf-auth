@@ -9,12 +9,12 @@ Facebook login.
 and very easy to extend library and you should probably use it. This library
 will never be as thoroughly tested and as powerful as allauth.
 
-However, we have found that we always need a few things on top of allauth and
-we always end up hooking up so many third party apps and overriding various
-settings/forms/classes, that "hooking up allauth" isn't really all that simple.
+However, we have found that we usually need a few things on top of allauth and
+end up hooking up various third party apps and override various
+settings/forms/classes. In the end, "just using allauth" isn't really all that simple any more.
 
 Unfortunately, our web apps are currently hybrid apps where some parts are
-"old schoold" Django views that rely on session based authentication. Therefore
+"old school" Django views that rely on session based authentication. Therefore
 we simply send our AJAX requests from our ReactJS apps with
 `withCredentials: true` and we re-use the session based authentication that was
 already set by Django. Our mobile apps, on the other hand, don't rely on
@@ -92,11 +92,31 @@ urlpatterns = [
 ]
 ```
 
+You are probably hooking up your API urls under a different path, so hook
+up the `drf_auth` API-URLs as well (probably in your `api_urls.py`):
+
+```python
+# In your main urls.py you might have something like this:
+urlpatterns = [
+    url(r'^api/(?P<version>v1)/', include('project.api_urls')),
+]
+
+# In your main api_urls.py you can then add this:
+urlpatterns = [
+    url(r'^auth/$', include('drf_auth.api_urls')),
+]
+```
+
 Don't forget to migrate your database:
 
 ```bash
 ./manage.py migrate drf_auth
 ```
+
+
+## Usage
+
+TODO: Describe various ways to try/test/use this app...
 
 
 ## Contribute
