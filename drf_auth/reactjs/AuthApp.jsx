@@ -50,4 +50,4 @@ class AuthApp extends React.Component {
 }
 
 
-render(<AuthApp />, document.getElementById("app"))
+render(<AuthApp />, document.getElementById("authApp"))

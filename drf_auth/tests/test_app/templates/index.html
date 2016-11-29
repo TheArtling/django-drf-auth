@@ -1,7 +1,13 @@
 {% load staticfiles %}
+<style>
+body {margin: 0px;}
+</style>
+<div id="authApp"></div>
 <h1>Index</h1>
 <div>User: {{ request.user }}</div>
-<div id="app"></div>
+<div onclick="drfAuthLoginClicked();">Login</div>
+<div onclick="drfAuthSignupClicked();">Signup</div>
 
-<script type="text/javascript" src="http://10.0.1.9:3000/assets/bundles/vendors.js"></script>
-<script type="text/javascript" src="http://10.0.1.9:3000/assets/bundles/AuthApp.js"></script>
+<script type="text/javascript" src="http://192.168.1.39:3000/assets/bundles/vendors.js"></script>
+<script type="text/javascript" src="http://192.168.1.39:3000/assets/bundles/AuthApp.js"></script>
+<script type="text/javascript" src="{% static "drf_auth/init.js" %}"></script>

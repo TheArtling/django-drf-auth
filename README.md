@@ -116,7 +116,26 @@ Don't forget to migrate your database:
 
 ## Usage
 
-TODO: Describe various ways to try/test/use this app...
+In your `base.html` you need to place a container into which we can render the
+ReactJS-based `AuthContainer` component. Our component is designed to slide in:
+from the top, so you should put it at the very top of your `body` tag.
+
+```html
+<body style="margin: 0px;">
+  <div id="authApp"></div>
+  <!-- ... header of your website -->
+  <div onclick="drfAuthLoginClicked();">Login</div>
+  <div onclick="drfAuthSignupClicked();">Signup</div>
+  <!-- ... rest of your base.html content -->
+  <script type="text/javascript" src="{% static "path/to/your/react/lib/"%}"></script>
+  <script type="text/javascript" src="{% static "drf_auth/AuthApp.js" %}"></script>
+  <script type="text/javascript" src="{% static "drf_auth/init.js" %}"></script>
+</body>
+```
+
+When you load `drf_auth/init.js` it registers a globally available function
+`drfAuthLoginClicked()` which emits a CustomEvent. The react component listens
+to that event and slides in when the event happens.
 
 
 ## Contribute
